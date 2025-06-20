@@ -1,5 +1,5 @@
-import {Router} from "core/router/router";
-import {ParameterResolver} from "core/resolvers/param-resolver";
+import {Router} from "../router/router";
+import {ParameterResolver} from "../resolvers/param-resolver";
 
 
 export class RequestHandler {
