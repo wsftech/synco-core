@@ -13,14 +13,16 @@ export class SyncoFactory {
     constructor(private readonly rootModule: any) {}
 
     private setupHealthCheck() {
-        this.router.routes.set('GET:/health', () => {
-            return new Response(JSON.stringify({
-                status: 'healthy',
-                metrics: this.observability.getMetrics()
-            }), {
-                headers: { 'Content-Type': 'application/json' }
+        for (const route of this.router.routes) {
+            route.set('GET:/health', () => {
+                return new Response(JSON.stringify({
+                    status: 'healthy',
+                    metrics: this.observability.getMetrics()
+                }), {
+                    headers: { 'Content-Type': 'application/json' }
+                });
             });
-        });
+        }
     }
 
     async start(port = 3000) {
