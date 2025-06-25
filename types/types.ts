@@ -4,4 +4,5 @@ export interface RouteDefinition {
     handler: Function;
     originalHandler: Function;
     instance: any;
+    set: any;
 }

@@ -2,7 +2,7 @@ import {match, match as pathMatch} from "path-to-regexp";
 import { RouteDefinition } from "../types/types";
 
 export class Router {
-    private routes: RouteDefinition[] = [];
+    routes: RouteDefinition[] = [];
 
     register(route: RouteDefinition) {
         this.routes.push(route);

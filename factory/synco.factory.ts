@@ -3,12 +3,25 @@ import chalk from "chalk";
 import {Router} from "../router/router";
 import {RequestHandler} from "../handlers/request";
 import {container} from "../di/container";
+import {ObservabilityManager} from "../observability";
 
 
 export class SyncoFactory {
     private router = new Router();
+    private observability = new ObservabilityManager();
 
     constructor(private readonly rootModule: any) {}
+
+    private setupHealthCheck() {
+        this.router.routes.set('GET:/health', () => {
+            return new Response(JSON.stringify({
+                status: 'healthy',
+                metrics: this.observability.getMetrics()
+            }), {
+                headers: { 'Content-Type': 'application/json' }
+            });
+        });
+    }
 
     async start(port = 3000) {
         new this.rootModule();
@@ -31,6 +44,7 @@ export class SyncoFactory {
                         handler: controllerInstance[methodName].bind(controllerInstance),
                         originalHandler: controllerInstance[methodName],
                         instance: controllerInstance,
+                        set: undefined
                     });
 
                     console.log(
@@ -41,11 +55,14 @@ export class SyncoFactory {
                         chalk.green(`[RouterExplorer]`) +
                         ` Mapped {${prefix}${routePath}, ${httpMethod.toUpperCase()}} route`
                     );
+                    console.log(`📊 Health check: http://localhost:${port}/health`);
                 }
             }
         }
 
         const handler = new RequestHandler(this.router);
+
+        this.setupHealthCheck();
 
         Bun.serve({
             port,
