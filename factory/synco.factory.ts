@@ -3,27 +3,13 @@ import chalk from "chalk";
 import {Router} from "../router/router";
 import {RequestHandler} from "../handlers/request";
 import {container} from "../di/container";
-import {ObservabilityManager} from "../observability";
 
 
 export class SyncoFactory {
     private router = new Router();
-    private observability = new ObservabilityManager();
+
 
     constructor(private readonly rootModule: any) {}
-
-    private setupHealthCheck() {
-        for (const route of this.router.routes) {
-            route.set('GET:/health', () => {
-                return new Response(JSON.stringify({
-                    status: 'healthy',
-                    metrics: this.observability.getMetrics()
-                }), {
-                    headers: { 'Content-Type': 'application/json' }
-                });
-            });
-        }
-    }
 
     async start(port = 3000) {
         new this.rootModule();
@@ -63,8 +49,6 @@ export class SyncoFactory {
         }
 
         const handler = new RequestHandler(this.router);
-
-        this.setupHealthCheck();
 
         Bun.serve({
             port,
